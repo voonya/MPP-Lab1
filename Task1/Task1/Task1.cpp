@@ -10,7 +10,6 @@ int main()
 {
     // initializing vars
 
-
     int arrayLength = 25;
     int countWordsInArray = 0;
 
@@ -35,122 +34,123 @@ int main()
     int bufferCount;
     // open file to read
     ifstream input(FILENAME);
+    if (input) {
+        // cycle to proccess input data
+    inputCycle:
+        // read word
+        if (input >> inputBuffer) {
+            // normalize word
+            index = 0;
+            processedWord = "";
+        prepareWord:
+            if (inputBuffer[index] != '\0') {
+                if (inputBuffer[index] >= 'A' && inputBuffer[index] <= 'Z' ||
+                    inputBuffer[index] >= 'a' && inputBuffer[index] <= 'z' ||
+                    (inputBuffer[index] == '-' && index != 0)
+                    ) {
+                    if (inputBuffer[index] >= 'A' && inputBuffer[index] <= 'Z') {
+                        processedWord += 'a' - 'A' + inputBuffer[index];
+                    }
+                    else {
+                        processedWord += inputBuffer[index];
+                    }
 
-    // cycle to proccess input data
-inputCycle:
-    // read word
-    if (input >> inputBuffer) {
-        // normalize word
-        index = 0;
-        processedWord = "";
-    prepareWord:
-        if (inputBuffer[index] != '\0') {
-            if (inputBuffer[index] >= 'A' && inputBuffer[index] <= 'Z' ||
-                inputBuffer[index] >= 'a' && inputBuffer[index] <= 'z' ||
-                (inputBuffer[index] == '-' && index != 0)
-                ) {
-                if (inputBuffer[index] >= 'A' && inputBuffer[index] <= 'Z') {
-                    processedWord += 'a' - 'A' + inputBuffer[index];
-                }
-                else {
-                    processedWord += inputBuffer[index];
                 }
 
+                index++;
+                goto prepareWord;
             }
 
-            index++;
-            goto prepareWord;
-        }
-
-        if (processedWord == "") {
-            goto inputCycle;
-        }
-        // check is it stop-word
-        index = 0;
-        isStopWord = false;
-    checkStopWord:
-        if (index < countStopWord) {
-            j = 0;
-            isStopWord = true;
-        checkCycle:
-            if (stopWords[index][j] != '\0' && processedWord[j] != '\0') {
-                if (stopWords[index][j] != processedWord[j]) {
-                    isStopWord = false;
-                    goto continueCheck;
-                }
-                j++;
-                goto checkCycle;
-            }
-            if (stopWords[index][j] != '\0' && processedWord[j] == '\0' ||
-                stopWords[index][j] == '\0' && processedWord[j] != '\0') {
-                isStopWord = false;
-            }
-        continueCheck:
-            if (isStopWord) {
+            if (processedWord == "") {
                 goto inputCycle;
             }
-            index++;
-            goto checkStopWord;
-        }
-
-
-        // check if this word is already exist in array
-        index = 0;
-    inArrayCycle:
-        if (index < countWordsInArray) {
-            if (index < countWordsInArray) {
+            // check is it stop-word
+            index = 0;
+            isStopWord = false;
+        checkStopWord:
+            if (index < countStopWord) {
                 j = 0;
-                isEqual = true;
-            checkCycle2:
-                if (words[index][j] != '\0' && processedWord[j] != '\0') {
-                    if (words[index][j] != processedWord[j]) {
-                        isEqual = false;
-                        goto continueCheck2;
+                isStopWord = true;
+            checkCycle:
+                if (stopWords[index][j] != '\0' && processedWord[j] != '\0') {
+                    if (stopWords[index][j] != processedWord[j]) {
+                        isStopWord = false;
+                        goto continueCheck;
                     }
                     j++;
-                    goto checkCycle2;
+                    goto checkCycle;
                 }
-                if (words[index][j] != '\0' && processedWord[j] == '\0' ||
-                    words[index][j] == '\0' && processedWord[j] != '\0') {
-                    isEqual = false;
+                if (stopWords[index][j] != '\0' && processedWord[j] == '\0' ||
+                    stopWords[index][j] == '\0' && processedWord[j] != '\0') {
+                    isStopWord = false;
                 }
-            continueCheck2:
-                if (isEqual) {
-                    counts[index]++;
+            continueCheck:
+                if (isStopWord) {
                     goto inputCycle;
                 }
                 index++;
-                goto inArrayCycle;
+                goto checkStopWord;
             }
-        }
-        // check if array needs to relocate
-        if (countWordsInArray > arrayLength * 0.7) {
-            arrayLength *= 2;
-            string* new_words = new string[arrayLength];
-            int* new_counts = new int[arrayLength];
 
+
+            // check if this word is already exist in array
             index = 0;
-        fillNewArray:
+        inArrayCycle:
             if (index < countWordsInArray) {
-                new_words[index] = words[index];
-                new_counts[index] = counts[index];
-
-                index++;
-                goto fillNewArray;
+                if (index < countWordsInArray) {
+                    j = 0;
+                    isEqual = true;
+                checkCycle2:
+                    if (words[index][j] != '\0' && processedWord[j] != '\0') {
+                        if (words[index][j] != processedWord[j]) {
+                            isEqual = false;
+                            goto continueCheck2;
+                        }
+                        j++;
+                        goto checkCycle2;
+                    }
+                    if (words[index][j] != '\0' && processedWord[j] == '\0' ||
+                        words[index][j] == '\0' && processedWord[j] != '\0') {
+                        isEqual = false;
+                    }
+                continueCheck2:
+                    if (isEqual) {
+                        counts[index]++;
+                        goto inputCycle;
+                    }
+                    index++;
+                    goto inArrayCycle;
+                }
             }
-            delete[]words;
-            delete[]counts;
-            words = new_words;
-            counts = new_counts;
-        }
-        // add new word
-        words[countWordsInArray] = processedWord;
-        counts[countWordsInArray] = 1;
-        countWordsInArray++;
-        goto inputCycle;
-    }
+            // check if array needs to relocate
+            if (countWordsInArray > arrayLength * 0.7) {
+                arrayLength *= 2;
+                string* new_words = new string[arrayLength];
+                int* new_counts = new int[arrayLength];
 
-    input.close();
+                index = 0;
+            fillNewArray:
+                if (index < countWordsInArray) {
+                    new_words[index] = words[index];
+                    new_counts[index] = counts[index];
+
+                    index++;
+                    goto fillNewArray;
+                }
+                delete[]words;
+                delete[]counts;
+                words = new_words;
+                counts = new_counts;
+            }
+            // add new word
+            words[countWordsInArray] = processedWord;
+            counts[countWordsInArray] = 1;
+            countWordsInArray++;
+            goto inputCycle;
+        }
+
+        input.close();
+    }
     // sort arrrays
 
     index = 0;
