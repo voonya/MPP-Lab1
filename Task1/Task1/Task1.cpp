@@ -123,7 +123,7 @@ int main()
                 }
             }
             // check if array needs to relocate
-            if (countWordsInArray > arrayLength * 0.7) {
+            if (countWordsInArray >= arrayLength) {
                 arrayLength *= 2;
                 string* new_words = new string[arrayLength];
                 int* new_counts = new int[arrayLength];
@@ -150,34 +150,36 @@ int main()
         }
 
         input.close();
-    }
-    // sort arrrays
 
-    index = 0;
-outerCycle:
-    if (index < countWordsInArray - 1) {
-        j = 0;
-    innerCycle:
-        if (j < countWordsInArray - index - 1) {
-            if (counts[j] < counts[j + 1]) {
-                bufferWord = words[j];
-                words[j] = words[j + 1];
-                words[j + 1] = bufferWord;
+        // sort arrrays
 
-                int bufferCount = counts[j];
-                counts[j] = counts[j + 1];
-                counts[j + 1] = bufferCount;
+        index = 0;
+    outerCycle:
+        if (index < countWordsInArray - 1) {
+            j = 0;
+        innerCycle:
+            if (j < countWordsInArray - index - 1) {
+                if (counts[j] < counts[j + 1]) {
+                    bufferWord = words[j];
+                    words[j] = words[j + 1];
+                    words[j + 1] = bufferWord;
+
+                    int bufferCount = counts[j];
+                    counts[j] = counts[j + 1];
+                    counts[j + 1] = bufferCount;
+                }
+                j++;
+                goto innerCycle;
             }
-            j++;
-            goto innerCycle;
+            index++;
+            goto outerCycle;
         }
-        index++;
-        goto outerCycle;
     }
+    
 
     // output arrays in file
 
-    ofstream outResult("result.txt");
+    ofstream outResult("output.txt");
     index = 0;
 outputCycle:
     if (index < countWordsInArray && index < countWordsToOutput) {

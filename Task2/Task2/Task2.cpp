@@ -142,7 +142,7 @@ fillPages:
                 }
             }
             // check if array needs to relocate
-            if (countWordsInArray > arrayLength * 0.7) {
+            if (countWordsInArray >= arrayLength) {
                 arrayLength *= 2;
                 string* new_words = new string[arrayLength];
                 int** new_pages = new int* [arrayLength];
@@ -175,51 +175,53 @@ fillPages:
             goto inputCycle;
         }
         input.close();
+
+        // sort arrrays
+
+        index = 0;
+    outerCycle:
+        if (index < countWordsInArray - 1) {
+            j = 0;
+        innerCycle:
+            if (j < countWordsInArray - index - 1) {
+                letter = 0;
+                needSwap = false;
+            cmpWords:
+                if (words[j][letter] != '\0' && words[j + 1][letter] != '\0') {
+                    if (words[j][letter] > words[j + 1][letter]) {
+                        needSwap = true;
+                        goto swap;
+                    }
+                    else if (words[j][letter] == words[j + 1][letter]) {
+                        letter++;
+                        goto cmpWords;
+                    }
+
+                }
+                if (words[j + 1][letter] == '\0' && words[j][letter] != '\0') {
+                    needSwap = true;
+                }
+            swap:
+                if (needSwap) {
+                    bufferWord = words[j];
+                    words[j] = words[j + 1];
+                    words[j + 1] = bufferWord;
+
+                    bufferPages = pages[j];
+                    pages[j] = pages[j + 1];
+                    pages[j + 1] = bufferPages;
+                }
+                j++;
+                goto innerCycle;
+            }
+            index++;
+            goto outerCycle;
+        }
     }
     
-    // sort arrrays
-
-    index = 0;
-outerCycle:
-    if (index < countWordsInArray - 1) {
-        j = 0;
-    innerCycle:
-        if (j < countWordsInArray - index - 1) {
-            letter = 0;
-            needSwap = false;
-        cmpWords:
-            if (words[j][letter] != '\0' && words[j + 1][letter] != '\0') {
-                if (words[j][letter] > words[j + 1][letter]) {
-                    needSwap = true;
-                    goto swap;
-                }
-                else if (words[j][letter] == words[j + 1][letter]) {
-                    letter++;
-                    goto cmpWords;
-                }
-
-            }
-            if (words[j + 1][letter] == '\0' && words[j][letter] != '\0') {
-                needSwap = true;
-            }
-        swap:
-            if (needSwap) {
-                bufferWord = words[j];
-                words[j] = words[j + 1];
-                words[j + 1] = bufferWord;
-
-                bufferPages = pages[j];
-                pages[j] = pages[j + 1];
-                pages[j + 1] = bufferPages;
-            }
-            j++;
-            goto innerCycle;
-        }
-        index++;
-        goto outerCycle;
-    }
+    
     // output arrays in file
-    ofstream outResult("result.txt");
+    ofstream outResult("output.txt");
     index = 0;
 outputCycle:
     if (index < countWordsInArray) {
