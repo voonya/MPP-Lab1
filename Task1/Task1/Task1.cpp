@@ -4,7 +4,7 @@
 using namespace std;
 
 const string FILENAME = "input.txt";
-const int countWordsToOutput = 50;
+const int countWordsToOutput = 25;
 
 int main()
 {
